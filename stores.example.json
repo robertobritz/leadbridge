@@ -1,0 +1,37 @@
+[
+  {
+    "key": "madesa-mx",
+    "label": "Madesa Mexico",
+    "shopDomain": "madesa-mx.myshopify.com",
+    "adminToken": "shpat_COLE_O_TOKEN_DA_LOJA_MX",
+    "allowedOrigins": ["https://madesa.mx"],
+    "defaultTags": ["pop-up-entrada"],
+    "phoneCountryCode": "52",
+    "marketingConsent": false
+  },
+  {
+    "key": "madesa-br",
+    "label": "Madesa Brasil",
+    "shopDomain": "totvsrs-madesa.myshopify.com",
+    "adminToken": "shpat_COLE_O_TOKEN_DA_LOJA_BR",
+    "allowedOrigins": ["https://madesa.com"],
+    "defaultTags": ["pop-up-entrada"],
+    "phoneCountryCode": "55",
+    "marketingConsent": false
+  },
+  {
+    "key": "exemplo-oauth",
+    "label": "Loja com renovacao automatica via OAuth (client_id/client_secret)",
+    "shopDomain": "exemplo-oauth.myshopify.com",
+    "oauth": {
+      "clientId": "COLE_O_CLIENT_ID_DO_DEV_DASHBOARD",
+      "clientSecret": "shpss_COLE_A_CLIENT_SECRET",
+      "scopes": ["read_customers", "write_customers"]
+    },
+    "allowedOrigins": ["https://exemplo.com"],
+    "defaultTags": ["pop-up-entrada"],
+    "phoneCountryCode": "52",
+    "marketingConsent": false
+  }
+]
+

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Entrar — Lead Bridge</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <main class="login-page">
+    <form class="login-card" id="login-form" autocomplete="on">
+      <div class="wordmark">Lead Bridge</div>
+
+      <div class="login-error" id="login-error" role="alert"></div>
+
+      <div class="field">
+        <label for="user">Usuário</label>
+        <input type="text" id="user" name="user" autocomplete="username" required autofocus>
+      </div>
+
+      <div class="field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="btn" id="submit">Entrar</button>
+    </form>
+  </main>
+
+  <script src="/assets/login.js"></script>
+</body>
+</html>

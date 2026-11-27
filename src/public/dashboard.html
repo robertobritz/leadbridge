@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Lead Bridge — painel</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wordmark">Lead Bridge</div>
+
+    <select id="store-filter" aria-label="Filtrar por loja">
+      <option value="">Todas as lojas</option>
+    </select>
+
+    <button type="button" class="btn btn-ghost" id="manage-stores-btn" title="Criar ou editar conexões com lojas Shopify">+ Loja</button>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="topbar-meta">
+      <span id="meta-version"></span>
+      <button type="button" class="btn-link" id="refresh">Atualizar</button>
+      <button type="button" class="btn-link" id="logout">Sair</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="tiles" id="tiles" aria-label="Resumo"></section>
+
+    <section class="section">
+      <div class="card strip-card">
+        <div class="section-head" style="margin-bottom:0">
+          <span class="eyebrow">Atividade por hora — últimas 48h</span>
+          <span class="filler"></span>
+          <span class="legend">
+            <span><i class="ok"></i> Gravados</span>
+            <span><i class="err"></i> Falhas</span>
+          </span>
+        </div>
+        <div class="strip" id="strip"></div>
+        <div class="strip-axis">
+          <span id="strip-start"></span>
+          <span id="strip-end"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="eyebrow">Lojas conectadas</span>
+      </div>
+      <div class="stores" id="stores"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="eyebrow">Histórico de envios</span>
+        <span class="filler"></span>
+        <input type="search" id="search" placeholder="Buscar por e-mail, nome ou telefone" style="min-width:250px">
+        <select id="status-filter" aria-label="Filtrar por resultado">
+          <option value="">Todos os resultados</option>
+          <option value="success">Gravados</option>
+          <option value="error">Falhas</option>
+          <option value="skipped">Ignorados</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Contato</th>
+                <th>Loja</th>
+                <th>Resultado</th>
+                <th>Ação</th>
+                <th>Quando</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div id="table-empty"></div>
+        <div class="pager">
+          <span id="pager-info"></span>
+          <span class="filler"></span>
+          <button type="button" class="btn btn-ghost" id="prev">Anterior</button>
+          <button type="button" class="btn btn-ghost" id="next">Próxima</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <div class="drawer-head">
+      <h2 id="drawer-title">Envio</h2>
+      <span class="filler" style="flex:1"></span>
+      <button type="button" class="btn-link" id="drawer-close">Fechar</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-foot">
+      <button type="button" class="btn" id="retry">Reenviar para a Shopify</button>
+      <span class="mono" id="retry-note" style="font-size:11px;color:var(--slate)"></span>
+    </div>
+  </aside>
+
+  <div class="drawer-backdrop" id="store-modal-backdrop"></div>
+  <aside class="drawer store-drawer" id="store-modal" role="dialog" aria-modal="true" aria-labelledby="store-modal-title">
+    <div class="drawer-head">
+      <h2 id="store-modal-title">Gerenciar lojas</h2>
+      <span class="filler" style="flex:1"></span>
+      <button type="button" class="btn-link" id="store-modal-close">Fechar</button>
+    </div>
+    <div class="drawer-body">
+      <div class="note note-warn" id="store-modal-readonly-note" style="display:none">
+        As lojas deste servidor são definidas pela variável de ambiente <code>STORES_CONFIG</code>. Para alterar, atualize essa variável na hospedagem e reinicie a aplicação — não é possível editar por aqui.
+      </div>
+
+      <div class="help-box">
+        <strong>Como preencher</strong>
+        <ul>
+          <li><b>Chave (key)</b> — identificador único da loja: só letras minúsculas, números e hífen (ex: <code>madesa-mx</code>). Não pode ser alterada depois de criada; para renomear, exclua e crie de novo.</li>
+          <li><b>Nome</b> — como a loja aparece no painel (ex: "Madesa México").</li>
+          <li><b>Domínio myshopify</b> — termina em <code>.myshopify.com</code>. Fica em Shopify Admin → Configurações → Domínios.</li>
+          <li>
+            <b>Autenticação</b> — escolha uma:
+            <ul>
+              <li><b>Token fixo (shpat_)</b>: gerado em Shopify Admin → Configurações → Apps e canais de vendas → Desenvolver apps → (seu app) → API credentials. Nunca expira sozinho.</li>
+              <li><b>OAuth (client_id/secret)</b>: use as credenciais do app criado no Partner Dashboard. Depois de salvar, abra <code>/oauth/{chave}/install</code> (logado no painel) para autorizar — o token passa a se renovar sozinho.</li>
+            </ul>
+          </li>
+          <li><b>Origens permitidas</b> — uma URL por linha (ex: <code>https://madesa.mx</code>): o site que pode enviar leads para essa loja.</li>
+          <li><b>Tags padrão</b> — opcional, aplicadas a todo contato criado por essa loja (uma por linha).</li>
+          <li><b>Código do país</b> — DDI para completar telefones sem prefixo (ex: 52 México, 55 Brasil).</li>
+          <li><b>Aceite de marketing</b> — se marcado, contatos criados por essa loja entram com opt-in de e-mail marketing na Shopify.</li>
+        </ul>
+      </div>
+
+      <div class="store-list" id="store-list"></div>
+
+      <button type="button" class="btn" id="store-add-new">+ Adicionar nova loja</button>
+
+      <form id="store-form" class="store-form" style="display:none">
+        <div class="field">
+          <label>Chave (key)</label>
+          <input type="text" id="sf-key" placeholder="madesa-mx">
+        </div>
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" id="sf-label" placeholder="Madesa México">
+        </div>
+        <div class="field">
+          <label>Domínio myshopify</label>
+          <input type="text" id="sf-domain" placeholder="madesa-mx.myshopify.com">
+        </div>
+        <div class="field">
+          <label>Autenticação</label>
+          <select id="sf-authmode">
+            <option value="static">Token fixo (shpat_)</option>
+            <option value="oauth">OAuth (client_id / client_secret)</option>
+          </select>
+        </div>
+        <div class="field" id="sf-static-fields">
+          <label>Admin token</label>
+          <input type="text" id="sf-token" placeholder="shpat_...">
+          <span class="field-hint" id="sf-token-hint"></span>
+        </div>
+        <div class="field" id="sf-oauth-fields" style="display:none">
+          <label>Client ID</label>
+          <input type="text" id="sf-client-id" placeholder="Client ID do Partner Dashboard">
+          <label style="margin-top:8px">Client secret</label>
+          <input type="text" id="sf-client-secret" placeholder="shpss_...">
+          <span class="field-hint" id="sf-secret-hint"></span>
+          <label style="margin-top:8px">Escopos (opcional, um por linha)</label>
+          <textarea id="sf-scopes" rows="2" placeholder="read_customers&#10;write_customers"></textarea>
+        </div>
+        <div class="field">
+          <label>Origens permitidas (uma por linha)</label>
+          <textarea id="sf-origins" rows="2" placeholder="https://madesa.mx"></textarea>
+        </div>
+        <div class="field">
+          <label>Tags padrão (uma por linha, opcional)</label>
+          <textarea id="sf-tags" rows="2" placeholder="pop-up-entrada"></textarea>
+        </div>
+        <div class="field">
+          <label>Código do país (DDI, opcional)</label>
+          <input type="text" id="sf-phone" placeholder="52">
+        </div>
+        <div class="field">
+          <label><input type="checkbox" id="sf-consent" style="width:auto"> Aceite de marketing por e-mail ativado</label>
+        </div>
+        <div id="sf-error" class="note note-error" style="display:none"></div>
+        <div class="store-form-actions">
+          <button type="submit" class="btn" id="sf-save">Salvar</button>
+          <button type="button" class="btn btn-ghost" id="sf-cancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/assets/app.js"></script>
+  <script src="/assets/stores.js"></script>
+</body>
+</html>
