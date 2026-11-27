@@ -744,3 +744,4 @@ src/
 theme/
   entry-modal-integration.js   Código para colar no tema
 ```
+editei aqui
