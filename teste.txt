@@ -2,4 +2,7 @@ Teste para criar um novo comit.
 teste numero 2 
 asdasdad
 
+teste 5
+
+OUTRA COISAs
 teste 4 não 5
